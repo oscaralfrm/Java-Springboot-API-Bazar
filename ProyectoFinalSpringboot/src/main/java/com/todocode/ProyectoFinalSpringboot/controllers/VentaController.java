@@ -22,7 +22,6 @@ public class VentaController {
     @PostMapping("/ventas/crear")
     @ResponseBody
     public String createVenta(@RequestBody Venta venta) {
-        ventaService.actualizarStock(venta);
         ventaService.createVenta(venta);
         return "Venta creada exitosamente";
     }

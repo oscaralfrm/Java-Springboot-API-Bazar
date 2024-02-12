@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.engine.internal.Cascade;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,9 +20,9 @@ public class Venta {
     private Long codigo_venta;
     private LocalDate fecha_venta;
     private Double total;
-    @OneToMany(mappedBy = "venta")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "venta")
     private List<Producto> listaProductos;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cliente",
     referencedColumnName = "id_cliente")
     private Cliente cliente;

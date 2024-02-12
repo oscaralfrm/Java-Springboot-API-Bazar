@@ -4,11 +4,15 @@ import com.todocode.ProyectoFinalSpringboot.dto.VentaDTO;
 import com.todocode.ProyectoFinalSpringboot.models.Cliente;
 import com.todocode.ProyectoFinalSpringboot.models.Producto;
 import com.todocode.ProyectoFinalSpringboot.models.Venta;
+import com.todocode.ProyectoFinalSpringboot.repositories.IClienteRepository;
+import com.todocode.ProyectoFinalSpringboot.repositories.IProductoRepository;
 import com.todocode.ProyectoFinalSpringboot.repositories.IVentaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,22 +21,48 @@ public class VentaService implements IVentaService {
     @Autowired
     private IVentaRepository ventaRepository;
 
-    @Override
-    public void createVenta(Venta venta) {
-        ventaRepository.save(venta);
-    }
+    // Necesitamos las persistencias de Cliente y Producto para hacer operaciones
+    @Autowired
+    private IClienteRepository clienteRepository;
+
+    @Autowired
+    private IProductoRepository productoRepository;
 
     @Override
-    public void actualizarStock(Venta venta) {
-        List<Producto> listaProductos = this.getVenta(venta.getCodigo_venta()).getListaProductos();
+    @Transactional
+    public void createVenta(Venta venta) {
+
+        // FIND del Cliente, para añadirlo a la venta
+
+        Cliente cliente = clienteRepository.findById(venta.getCliente().getId_cliente()).orElse(null);
+
+        // FIND de los productos para añadirlos a la venta
+
+        List<Producto> listaProductos = productoRepository.findAll();
+
+
+        // TOTAL - Cálculo del Total de la venta
+
+        // Acumulador del Total
+        Double total = 0D;
+
         for (Producto producto : listaProductos) {
-            Double cantidad_producto_disponible = producto.getCantidad_disponible();
-            if (cantidad_producto_disponible > 0) {
-                producto.setCantidad_disponible(cantidad_producto_disponible - 1);
-            } else {
-                listaProductos.remove(producto);
-            }
+            total += producto.getCosto();
+            producto.setVenta(venta);
+
         }
+
+        // SET - Setteamos las configuraciones que se enviarán al JSON
+
+
+        venta.setCliente(cliente);
+        venta.setListaProductos(listaProductos);
+        venta.setTotal(total);
+
+        // SAVE - Por último, guardamos
+
+        ventaRepository.save(venta);
+
     }
 
     @Override

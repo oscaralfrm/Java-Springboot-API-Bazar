@@ -14,10 +14,6 @@ public interface IVentaService {
 
     public void createVenta(Venta venta);
 
-    // CREATE - ACTUALIZAR STOCK
-
-    public void actualizarStock(Venta venta);
-
 
     // READ - ALL
 

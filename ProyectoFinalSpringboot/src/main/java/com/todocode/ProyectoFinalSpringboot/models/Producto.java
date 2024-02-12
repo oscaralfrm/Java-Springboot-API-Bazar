@@ -18,7 +18,7 @@ public class Producto {
     private String marca;
     private Double costo;
     private Double cantidad_disponible;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "codigo_venta")
     private Venta venta;
 
